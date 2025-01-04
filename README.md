@@ -1,5 +1,9 @@
 # Discord Share Chrome Extension
 
+## Demo 
+
+https://www.loom.com/share/800848f29aaa4e028b2cd25198bee3b7
+
 ## Overview
 
 The Discord Share Chrome Extension allows users to share content from any webpage directly to their Discord channels using webhooks. This extension provides a floating button on the webpage for easy access and a settings popup to manage webhooks.
