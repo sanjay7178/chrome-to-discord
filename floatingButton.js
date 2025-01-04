@@ -10,6 +10,7 @@ class DiscordShareButton {
         this.initialY = 0;
         this.xOffset = 0;
         this.yOffset = 0;
+        this.buttonSize = 48; // Size of the button in pixels
     }
 
     createButton() {
@@ -56,11 +57,9 @@ class DiscordShareButton {
             const notesInput = document.createElement('textarea');
             notesInput.className = 'discord-share-notes';
             notesInput.placeholder = 'Add notes (optional)...';
-            // Prevent menu from closing when clicking textarea
             notesInput.addEventListener('click', (e) => e.stopPropagation());
             this.menu.appendChild(notesInput);
 
-            // Add click handler to entire menu to prevent closing
             this.menu.addEventListener('click', (e) => e.stopPropagation());
 
             if (this.webhooks.length === 0) {
@@ -81,10 +80,47 @@ class DiscordShareButton {
                 });
             }
 
+            // Get viewport dimensions and button position
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const buttonRect = this.button.getBoundingClientRect();
+            const menuWidth = 300; // Fixed menu width
+            const margin = 10;
+
+            // Calculate menu position - start from button center
+            let left = buttonRect.left + (buttonRect.width / 2) - (menuWidth / 2);
+            let top = buttonRect.top - margin;
+
+            // Show menu above button by default
             this.menu.style.display = 'block';
-            const rect = this.button.getBoundingClientRect();
-            this.menu.style.left = `${rect.left}px`;
-            this.menu.style.top = `${rect.top - this.menu.offsetHeight}px`;
+            let menuHeight = this.menu.offsetHeight;
+
+            // Adjust horizontal position to keep menu within viewport
+            left = Math.min(left, viewportWidth - menuWidth - margin);
+            left = Math.max(left, margin);
+
+            // Determine whether to show menu above or below button
+            if (buttonRect.top - menuHeight - margin < 0) {
+                // Not enough space above, show below
+                top = buttonRect.bottom + margin;
+                
+                // If no space below either, show where there's more space
+                if (top + menuHeight > viewportHeight) {
+                    const spaceAbove = buttonRect.top;
+                    const spaceBelow = viewportHeight - buttonRect.bottom;
+                    top = spaceBelow > spaceAbove ? 
+                        buttonRect.bottom + margin :
+                        viewportHeight - menuHeight - margin;
+                }
+            } else {
+                // Show above
+                top = buttonRect.top - menuHeight - margin;
+            }
+
+            // Apply the final position
+            this.menu.style.position = 'fixed';
+            this.menu.style.left = `${left}px`;
+            this.menu.style.top = `${top}px`;
         }
     }
 
@@ -106,6 +142,10 @@ class DiscordShareButton {
         if (this.isDragging) {
             e.preventDefault();
 
+            // Get viewport dimensions
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
             if (e.type === 'touchmove') {
                 this.currentX = e.touches[0].clientX - this.initialX;
                 this.currentY = e.touches[0].clientY - this.initialY;
@@ -113,6 +153,10 @@ class DiscordShareButton {
                 this.currentX = e.clientX - this.initialX;
                 this.currentY = e.clientY - this.initialY;
             }
+
+            // Constrain to viewport bounds
+            this.currentX = Math.min(Math.max(this.currentX, -this.buttonSize), viewportWidth - this.buttonSize);
+            this.currentY = Math.min(Math.max(this.currentY, -this.buttonSize), viewportHeight - this.buttonSize);
 
             this.xOffset = this.currentX;
             this.yOffset = this.currentY;
