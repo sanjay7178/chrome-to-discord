@@ -45,6 +45,34 @@ class DiscordShareButton {
         this.button.addEventListener('click', (e) => this.showMenu(e));
     }
 
+    showMenu(e) {
+        if (!this.isDragging) {
+            e.stopPropagation();
+
+            const selection = window.getSelection().toString();
+            this.menu.innerHTML = '';
+
+            if (this.webhooks.length === 0) {
+                const item = document.createElement('div');
+                item.className = 'discord-share-menu-item';
+                item.textContent = 'Please set up webhooks in extension settings';
+                this.menu.appendChild(item);
+            } else {
+                this.webhooks.forEach(webhook => {
+                    const item = document.createElement('div');
+                    item.className = 'discord-share-menu-item';
+                    item.textContent = `Share to ${webhook.name}`;
+                    item.addEventListener('click', () => this.shareContent(webhook, selection));
+                    this.menu.appendChild(item);
+                });
+            }
+
+            this.menu.style.display = 'block';
+            const rect = this.button.getBoundingClientRect();
+            this.menu.style.left = `${rect.left}px`;
+            this.menu.style.top = `${rect.top - this.menu.offsetHeight}px`;
+        }
+    }
     dragStart(e) {
         if (e.type === 'touchstart') {
             this.initialX = e.touches[0].clientX - this.xOffset;
@@ -121,6 +149,12 @@ class DiscordShareButton {
     }
 
     async shareContent(webhook, content) {
+        const url = window.location.href;
+        const title = document.title;
+        const customMessage = content || 'No content selected';
+
+        const message = `**${title}**\n${url}\n\n${customMessage}`;
+
         try {
             const response = await fetch(webhook.url, {
                 method: 'POST',
@@ -128,7 +162,7 @@ class DiscordShareButton {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    content: content || 'No content selected'
+                    content: message
                 })
             });
 
