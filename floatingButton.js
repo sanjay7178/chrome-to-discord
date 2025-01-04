@@ -52,6 +52,17 @@ class DiscordShareButton {
             const selection = window.getSelection().toString();
             this.menu.innerHTML = '';
 
+            // Add notes textarea
+            const notesInput = document.createElement('textarea');
+            notesInput.className = 'discord-share-notes';
+            notesInput.placeholder = 'Add notes (optional)...';
+            // Prevent menu from closing when clicking textarea
+            notesInput.addEventListener('click', (e) => e.stopPropagation());
+            this.menu.appendChild(notesInput);
+
+            // Add click handler to entire menu to prevent closing
+            this.menu.addEventListener('click', (e) => e.stopPropagation());
+
             if (this.webhooks.length === 0) {
                 const item = document.createElement('div');
                 item.className = 'discord-share-menu-item';
@@ -62,7 +73,10 @@ class DiscordShareButton {
                     const item = document.createElement('div');
                     item.className = 'discord-share-menu-item';
                     item.textContent = `Share to ${webhook.name}`;
-                    item.addEventListener('click', () => this.shareContent(webhook, selection));
+                    item.addEventListener('click', () => {
+                        const notes = notesInput.value.trim();
+                        this.shareContent(webhook, selection, notes);
+                    });
                     this.menu.appendChild(item);
                 });
             }
@@ -73,6 +87,7 @@ class DiscordShareButton {
             this.menu.style.top = `${rect.top - this.menu.offsetHeight}px`;
         }
     }
+
     dragStart(e) {
         if (e.type === 'touchstart') {
             this.initialX = e.touches[0].clientX - this.xOffset;
@@ -119,41 +134,13 @@ class DiscordShareButton {
         this.webhooks = result.webhooks || [];
     }
 
-    showMenu(e) {
-        if (!this.isDragging) {
-            e.stopPropagation();
-
-            const selection = window.getSelection().toString();
-            this.menu.innerHTML = '';
-
-            if (this.webhooks.length === 0) {
-                const item = document.createElement('div');
-                item.className = 'discord-share-menu-item';
-                item.textContent = 'Please set up webhooks in extension settings';
-                this.menu.appendChild(item);
-            } else {
-                this.webhooks.forEach(webhook => {
-                    const item = document.createElement('div');
-                    item.className = 'discord-share-menu-item';
-                    item.textContent = `Share to ${webhook.name}`;
-                    item.addEventListener('click', () => this.shareContent(webhook, selection));
-                    this.menu.appendChild(item);
-                });
-            }
-
-            this.menu.style.display = 'block';
-            const rect = this.button.getBoundingClientRect();
-            this.menu.style.left = `${rect.left}px`;
-            this.menu.style.top = `${rect.top - this.menu.offsetHeight}px`;
-        }
-    }
-
-    async shareContent(webhook, content) {
+    async shareContent(webhook, content, notes) {
         const url = window.location.href;
         const title = document.title;
         const customMessage = content || 'No content selected';
+        const notesSection = notes ? `\n\n**Notes:**\n${notes}` : '';
 
-        const message = `**${title}**\n${url}\n\n${customMessage}`;
+        const message = `**${title}**\n${url}\n\n${customMessage}${notesSection}`;
 
         try {
             const response = await fetch(webhook.url, {

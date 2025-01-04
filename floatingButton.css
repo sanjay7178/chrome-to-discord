@@ -44,22 +44,33 @@
 
     .discord-share-menu {
         background: #2C2F33;
-        color: #FFFFFF;
     }
 
     .discord-share-menu-item:hover {
         background-color: #23272A;
     }
+
+    .discord-share-notes {
+        background-color: #23272A;
+        border-color: #444;
+        color: #FFFFFF;
+    }
+    
+    .discord-share-notes::placeholder {
+        color: #666;
+    }
 }
 
 .discord-share-menu {
     position: fixed;
-    background: black;
+    background: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     padding: 8px 0;
     z-index: 10001;
     display: none;
+    min-width: 200px;
+    max-width: 300px;
 }
 
 .discord-share-menu.show {
@@ -87,4 +98,27 @@
     100% {
         background-position: 0% 50%;
     }
+}
+
+.discord-share-notes {
+    width: calc(100% - 16px); /* Full width minus padding */
+    margin: 8px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 200px;
+    font-family: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    display: block;
+    background: inherit;
+    color: inherit;
+    position: relative;
+    z-index: 10002; /* Ensure textarea is above menu */
+}
+
+.discord-share-notes::placeholder {
+    color: #999;
 }
