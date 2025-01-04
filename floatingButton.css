@@ -1,0 +1,51 @@
+#discord-share-button {
+    position: fixed;
+    width: 48px;
+    height: 48px;
+    background-color: #7289DA;
+    border-radius: 50%;
+    cursor: move;
+    z-index: 10000;
+    bottom: 20px;
+    right: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    touch-action: none;
+}
+
+#discord-share-button:hover {
+    background-color: #677BC4;
+}
+
+#discord-share-button img {
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+}
+
+.discord-share-menu {
+    position: fixed;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    z-index: 10001;
+    display: none;
+}
+
+.discord-share-menu.show {
+    display: block;
+}
+
+.discord-share-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.discord-share-menu-item:hover {
+    background-color: #f5f5f5;
+}

@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Discord Share",
+    "version": "1.0",
+    "description": "Share content to Discord channels via webhooks",
+    "permissions": [
+      "storage",
+      "contextMenus",
+      "activeTab",
+      "scripting"
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [{
+      "matches": ["<all_urls>"],
+      "css": ["floatingButton.css"],
+      "js": ["floatingButton.js"]
+    }],
+    "icons": {
+
+    }
+  }
+  
